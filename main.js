@@ -9,7 +9,7 @@ const player1 = {
     weapon: ['lasso', 'knife', 'lash'],
     attack: function(name) {
         console.log(name + ' Fight...');
-    }
+    },
 };
 
 const player2 = {
@@ -20,7 +20,7 @@ const player2 = {
     weapon: ['gun', 'fork', 'ray'],
     attack: function(name) {
         console.log(name + ' Fight...');
-    }
+    },
 };
 
 function createElement(tag, className) {
@@ -49,40 +49,47 @@ function createPlayer(playerInfo) {
     $progressbar.appendChild($name);
     $character.appendChild($img);
 
-    return $player
+    return $player;
 }
 
 function changeHP(player) {
     const playerLife = document.querySelector('.player' + player.player + ' .life');
-    player.hp -= Math.ceil(Math.random() * 20);
-
+    player.hp -= getRandom(20);
     if (player.hp <= 0) {
         player.hp = 0;
-        randomButton.disabled = true;
     }
-
     playerLife.style.width = player.hp + '%';
-
-    if (player1.hp === 0) {
-        arenas.appendChild(playerWin(player2));
-    }
-
-    if (player2.hp === 0) {
-        arenas.appendChild(playerWin(player1));
-    }
 }
 
-function playerWin(player) {
+function playerWins(name) {
     const $winTitle = createElement('div', 'loseTitle');
-
-    $winTitle.innerText = player.name + ' win!';
-
+    if (name) {
+        $winTitle.innerText = name + ' wins!';
+    } else {
+        $winTitle.innerText = 'Draw!';
+    }
     return $winTitle;
+}
+
+function getRandom(num) {
+    return Math.ceil(Math.random() * num);
 }
 
 randomButton.addEventListener('click', function () {
     changeHP(player1);
     changeHP(player2);
+
+    if (player1.hp === 0 || player2.hp === 0) {
+        randomButton.disabled = true;
+    }
+
+    if (player1.hp === 0 && player1.hp < player2.hp) {
+        arenas.appendChild(playerWins(player2.name));
+    } else if (player2.hp === 0 && player2.hp < player1.hp) {
+        arenas.appendChild(playerWins(player1.name));
+    } else if (player1.hp === 0 && player2.hp === 0) {
+        arenas.appendChild(playerWins());
+    }
 })
 
 arenas.appendChild(createPlayer(player1));
