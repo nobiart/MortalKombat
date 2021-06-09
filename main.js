@@ -10,12 +10,11 @@ function changeHP(damage) {
 }
 
 function elHP() {
-    return document.querySelector('.player' + this.player);
+    return document.querySelector('.player' + this.player + ' .life');
 }
 
 function renderHP() {
-    const playerLife = elHP.call(this).querySelector('.life');
-    return playerLife.style.width = this.hp + '%';
+    return elHP.call(this).style.width = this.hp + '%';
 }
 
 const player1 = {
