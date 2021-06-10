@@ -1,6 +1,22 @@
 const arenas = document.querySelector('.arenas');
 const randomButton = document.querySelector('.button');
 
+function changeHP(damage) {
+    this.hp -= damage;
+    if (this.hp <= 0) {
+        this.hp = 0;
+    }
+    return this.hp;
+}
+
+function elHP() {
+    return document.querySelector('.player' + this.player + ' .life');
+}
+
+function renderHP() {
+    return elHP.call(this).style.width = this.hp + '%';
+}
+
 const player1 = {
     player: 1,
     name: 'Scorpion',
@@ -10,6 +26,9 @@ const player1 = {
     attack: function(name) {
         console.log(name + ' Fight...');
     },
+    changeHP: changeHP,
+    elHP: elHP,
+    renderHP: renderHP,
 };
 
 const player2 = {
@@ -21,6 +40,9 @@ const player2 = {
     attack: function(name) {
         console.log(name + ' Fight...');
     },
+    changeHP: changeHP,
+    elHP: elHP,
+    renderHP: renderHP,
 };
 
 function createElement(tag, className) {
@@ -52,15 +74,6 @@ function createPlayer(playerInfo) {
     return $player;
 }
 
-function changeHP(player) {
-    const playerLife = document.querySelector('.player' + player.player + ' .life');
-    player.hp -= getRandom(20);
-    if (player.hp <= 0) {
-        player.hp = 0;
-    }
-    playerLife.style.width = player.hp + '%';
-}
-
 function playerWins(name) {
     const $winTitle = createElement('div', 'loseTitle');
     if (name) {
@@ -76,11 +89,14 @@ function getRandom(num) {
 }
 
 randomButton.addEventListener('click', function () {
-    changeHP(player1);
-    changeHP(player2);
+    player1.changeHP(getRandom(20));
+    player1.renderHP();
+    player2.changeHP(getRandom(20));
+    player2.renderHP();
 
     if (player1.hp === 0 || player2.hp === 0) {
         randomButton.disabled = true;
+        createReloadButton();
     }
 
     if (player1.hp === 0 && player1.hp < player2.hp) {
@@ -90,7 +106,19 @@ randomButton.addEventListener('click', function () {
     } else if (player1.hp === 0 && player2.hp === 0) {
         arenas.appendChild(playerWins());
     }
-})
+});
+
+function createReloadButton() {
+    const reloadWrap = createElement('div', 'reloadWrap');
+    const reloadButton = createElement('button', 'button');
+    reloadButton.innerText = 'Restart';
+    reloadWrap.appendChild(reloadButton);
+    arenas.appendChild(reloadWrap);
+
+    reloadButton.addEventListener('click', function () {
+        window.location.reload();
+    });
+}
 
 arenas.appendChild(createPlayer(player1));
 arenas.appendChild(createPlayer(player2));
