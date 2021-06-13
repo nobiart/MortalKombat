@@ -78,6 +78,7 @@ const player1 = {
     hp: 100,
     img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
     weapon: ['lasso', 'knife', 'lash'],
+    damage: 0,
     attack,
     changeHP,
     elHP,
@@ -90,6 +91,7 @@ const player2 = {
     hp: 100,
     img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
     weapon: ['gun', 'fork', 'ray'],
+    damage: 0,
     attack,
     changeHP,
     elHP,
@@ -226,9 +228,7 @@ function generateLogs(type, playerHit, playerDefence) {
         case 'defence':
             logText = `${time} - ${logs[type][getRandom(logs[type].length) - 1]
                 .replace('[playerKick]', playerHit.name)
-                .replace('[playerDefence]', playerDefence.name)}.
-                [-${playerDefence.damage}] 
-                [${playerDefence.hp}/100]`;
+                .replace('[playerDefence]', playerDefence.name)}.`;
             break;
         case 'end':
             logText = logs[type][getRandom(logs[type].length) - 1]
@@ -255,29 +255,20 @@ formFight.addEventListener('submit', function (e) {
     if (player.defence !== enemy.hit) {
         player1.changeHP(enemy.value);
         player1.renderHP();
-        console.log(`## Второй игрок нанес урон первому: ${enemy.value}`);
+        //console.log(`## Второй игрок нанес урон первому: ${enemy.value}`);
+        generateLogs('hit', player2, player1);
+    } else {
         generateLogs('defence', player2, player1);
     }
 
-    if (player.defence === enemy.hit) {
-        console.log('Первый поставил блок');
-    }
-
-    if (enemy.defence !== player.hit) {
+    if (player.hit !== enemy.defence) {
         player2.changeHP(player.value);
         player2.renderHP();
-        console.log(`## Первый игрок нанес урон второму: ${player.value}`);
+        //console.log(`## Первый игрок нанес урон второму: ${player.value}`);
         generateLogs('hit', player1, player2);
+    } else {
+        generateLogs('defence', player1, player2);
     }
-
-    if (enemy.defence === player.hit) {
-        console.log('Второй поставил блок');
-    }
-
-
 
     showResult();
-
-    // console.log('####: a', attack);
-    // console.log('####: e', enemy);
 });
