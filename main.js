@@ -240,6 +240,7 @@ function generateLogs(type, playerHit, playerDefence) {
             break;
         default:
             logText = 'Something else';
+            break;
     }
     const el = `<p>${logText}</p>`;
     chat.insertAdjacentHTML('afterbegin', el);
