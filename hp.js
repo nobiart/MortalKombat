@@ -1,4 +1,4 @@
-export function changeHP(damage) {
+function changeHP(damage) {
     this.hp -= damage;
     if (this.hp <= 0) {
         this.hp = 0;
@@ -7,14 +7,16 @@ export function changeHP(damage) {
     return this.hp;
 }
 
-export function elHP() {
+function elHP() {
     return document.querySelector('.player' + this.player + ' .life');
 }
 
-export function renderHP() {
+function renderHP() {
     return elHP.call(this).style.width = this.hp + '%';
 }
 
-export function attack() {
+function attack() {
     console.log(this.name + ' ' + 'Fight...');
 }
+
+export { changeHP, elHP, renderHP, attack };

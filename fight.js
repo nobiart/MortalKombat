@@ -2,7 +2,7 @@ import { HIT, ATTACK } from './values.js';
 import { getRandom } from './utils.js';
 import { formFight } from './elements.js';
 
-export function enemyAttack() {
+function enemyAttack() {
     const hit = ATTACK[getRandom(3) - 1];
     const defence = ATTACK[getRandom(3) - 1];
 
@@ -13,7 +13,7 @@ export function enemyAttack() {
     }
 }
 
-export function playerAttack() {
+function playerAttack() {
     const attack = {};
     for (let item of formFight) {
         if (item.checked && item.name === 'hit') {
@@ -28,3 +28,5 @@ export function playerAttack() {
 
     return attack;
 }
+
+export { enemyAttack, playerAttack };
