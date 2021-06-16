@@ -7,21 +7,21 @@ import { createPlayer } from './create-player.js';
 
 formFight.addEventListener('submit', function (e) {
     e.preventDefault();
-    const enemy = enemyAttack();
-    const player = playerAttack();
+    const { hit: hitEnemy, defence: defenceEnemy, value: valueEnemy } = enemyAttack();
+    const { hit, defence, value } = playerAttack();
 
-    if (player.defence !== enemy.hit) {
-        player1.changeHP(enemy.value);
+    if (defence !== hitEnemy) {
+        player1.changeHP(valueEnemy);
         player1.renderHP();
-        generateLogs('hit', player2, player1, enemy.value);
+        generateLogs('hit', player2, player1, valueEnemy);
     } else {
         generateLogs('defence', player2, player1);
     }
 
-    if (player.hit !== enemy.defence) {
-        player2.changeHP(player.value);
+    if (hit !== defenceEnemy) {
+        player2.changeHP(value);
         player2.renderHP();
-        generateLogs('hit', player1, player2, player.value);
+        generateLogs('hit', player1, player2, value);
     } else {
         generateLogs('defence', player1, player2);
     }
