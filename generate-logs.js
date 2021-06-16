@@ -1,41 +1,22 @@
-import { logs } from "./logs.js";
-import { getRandom } from "./utils.js";
 import { chat } from "./elements.js";
+import { getTextLog } from "./get-text-log.js";
+import { getTime } from "./utils.js";
 
-function generateLogs(type, playerHit, playerDefence) {
-    let logText = '';
-    const time = new Date().toLocaleTimeString().slice(0,-3);
-    switch (type) {
-        case 'start':
-            logText = `${logs[type]
-                .replace('[time]', time)
-                .replace('[player1]', playerHit.name)
-                .replace('[player2]', playerDefence.name)}`;
-            break;
+function generateLogs(type, player1 = {}, player2 = {}, valueAttack) {
+    let text = getTextLog(type, player1.name, player2.name);
+    switch(type) {
         case 'hit':
-            logText = `${time} - ${logs[type][getRandom(logs[type].length) - 1]
-                .replace('[playerKick]', playerHit.name)
-                .replace('[playerDefence]', playerDefence.name)}.
-                [-${playerDefence.damage}] 
-                [${playerDefence.hp}/100]`;
+            text = `${getTime()} ${text} -${valueAttack} [${player2.hp}/100]`;
             break;
         case 'defence':
-            logText = `${time} - ${logs[type][getRandom(logs[type].length) - 1]
-                .replace('[playerKick]', playerHit.name)
-                .replace('[playerDefence]', playerDefence.name)}.`;
-            break;
         case 'end':
-            logText = logs[type][getRandom(logs[type].length) - 1]
-                .replace('[playerWins]', playerHit.name)
-                .replace('[playerLose]', playerDefence.name);
-            break;
         case 'draw':
-            logText = logs[type];
+            text = `${getTime()} ${text}`;
             break;
-        default:
-            logText = 'Something else';
+
     }
-    const el = `<p>${logText}</p>`;
+
+    const el = `<p>${text}</p>`;
     chat.insertAdjacentHTML('afterbegin', el);
 }
 
