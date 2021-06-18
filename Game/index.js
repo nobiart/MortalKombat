@@ -1,6 +1,6 @@
 import { getRandom, createElement, getTime } from "../utils";
 import { HIT, ATTACK, LOGS } from "../constants";
-import { Scorpion, Subzero, createPlayer } from "../Player";
+import Player from "../Player";
 
 export class Game {
     constructor() {
@@ -8,6 +8,21 @@ export class Game {
         this.arenas = document.querySelector('.arenas');
         this.fightButton = document.querySelector('.button');
         this.chat = document.querySelector('.chat');
+        this.scorpion = new Player({
+            player: 1,
+            name: 'Scorpion',
+            hp: 100,
+            img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
+            rootSelector: 'arenas',
+        });
+        this.subzero = new Player({
+            player: 2,
+            name: 'Subzero',
+            hp: 100,
+            img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
+            selector: `player${this.player}`,
+            rootSelector: 'arenas',
+        });
     }
 
     enemyAttack = () => {
@@ -125,10 +140,10 @@ export class Game {
     }
 
     start = () => {
-        this.arenas.appendChild(createPlayer(Scorpion));
-        this.arenas.appendChild(createPlayer(Subzero));
+        this.scorpion.createPlayer();
+        this.subzero.createPlayer();
         
-        this.generateLogs('start', Scorpion, Subzero);
+        this.generateLogs('start', this.scorpion, this.subzero);
 
         this.formFight.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -136,22 +151,22 @@ export class Game {
             const { hit, defence, value } = this.playerAttack();
         
             if (defence !== hitEnemy) {
-                Scorpion.changeHP(valueEnemy);
-                Scorpion.renderHP();
-                this.generateLogs('hit', Subzero, Scorpion, valueEnemy);
+                this.scorpion.changeHP(valueEnemy);
+                this.scorpion.renderHP();
+                this.generateLogs('hit', this.subzero, this.scorpion, valueEnemy);
             } else {
-                this.generateLogs('defence', Subzero, Scorpion);
+                this.generateLogs('defence', this.subzero, this.scorpion);
             }
         
             if (hit !== defenceEnemy) {
-                Subzero.changeHP(value);
-                Subzero.renderHP();
-                this.generateLogs('hit', Scorpion, Subzero, value);
+                this.subzero.changeHP(value);
+                this.subzero.renderHP();
+                this.generateLogs('hit', this.scorpion, this.subzero, value);
             } else {
-                this.generateLogs('defence', Scorpion, Subzero);
+                this.generateLogs('defence', this.scorpion, this.subzero);
             }
         
-            this.showResult(Scorpion, Subzero);
+            this.showResult(this.scorpion, this.subzero);
         });
     }
 }
