@@ -1,5 +1,5 @@
 import { getRandom, createElement, getTime } from "../utils";
-import { HIT, ATTACK, LOGS } from "../constants";
+import { HIT, LOGS } from "../constants";
 import Player from "../Player";
 
 export class Game {
@@ -8,35 +8,13 @@ export class Game {
         this.arenas = document.querySelector('.arenas');
         this.fightButton = document.querySelector('.button');
         this.chat = document.querySelector('.chat');
-        this.scorpion = new Player({
-            player: 1,
-            name: 'Scorpion',
-            hp: 100,
-            img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
-            rootSelector: 'arenas',
-        });
-        this.subzero = new Player({
-            player: 2,
-            name: 'Subzero',
-            hp: 100,
-            img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
-            selector: `player${this.player}`,
-            rootSelector: 'arenas',
-        });
     }
 
-    enemyAttack = () => {
-        const hit = ATTACK[getRandom(3) - 1];
-        const defence = ATTACK[getRandom(3) - 1];
-    
-        return {
-            value: getRandom(HIT[hit]),
-            hit,
-            defence,
-        }
+    getRandomPlayer = async () => {
+        return  fetch('https://reactmarathon-api.herokuapp.com/api/mk/player/choose').then(res => res.json());
     }
-    
-    playerAttack = () => {
+
+    playerAttack = async () => {
         const attack = {};
         for (let item of this.formFight) {
             if (item.checked && item.name === 'hit') {
@@ -48,8 +26,16 @@ export class Game {
             }
             item.checked = false;
         }
-    
-        return attack;
+
+        const values = await fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
+            method: 'POST',
+            body: JSON.stringify({
+                hit: attack.hit,
+                defence: attack.defence,
+            })
+        }).then(res => res.json());
+
+        return values;
     }
 
     createReloadButton = () => {
@@ -118,7 +104,7 @@ export class Game {
                 return LOGS[type];
             default:
                 return 'Something else';
-        }      
+        }
     }
 
     generateLogs = (type, { name }, { name: playerName2, hp }, valueAttack) => {
@@ -132,41 +118,56 @@ export class Game {
             case 'draw':
                 text = `${getTime()} ${text}`;
                 break;
-    
+
         }
-    
+
         const el = `<p>${text}</p>`;
         this.chat.insertAdjacentHTML('afterbegin', el);
     }
 
-    start = () => {
-        this.scorpion.createPlayer();
-        this.subzero.createPlayer();
-        
-        this.generateLogs('start', this.scorpion, this.subzero);
+    start = async () => {
+        const p1 = await this.getRandomPlayer();
+        const p2 = await this.getRandomPlayer();
+        const player1 = new Player({
+            ...p1,
+            player: 1,
+            rootSelector: 'arenas'
+        });
+        const player2 = new Player({
+            ...p2,
+            player: 2,
+            rootSelector: 'arenas'
+        });
 
-        this.formFight.addEventListener('submit', (e) => {
+        player1.createPlayer();
+        player2.createPlayer();
+        
+        this.generateLogs('start', player1, player2);
+
+        this.formFight.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const { hit: hitEnemy, defence: defenceEnemy, value: valueEnemy } = this.enemyAttack();
-            const { hit, defence, value } = this.playerAttack();
-        
-            if (defence !== hitEnemy) {
-                this.scorpion.changeHP(valueEnemy);
-                this.scorpion.renderHP();
-                this.generateLogs('hit', this.subzero, this.scorpion, valueEnemy);
+
+            const players = await this.playerAttack();
+            const attack = players.player1;
+            const enemy = players.player2;
+
+            if (attack.defence !== enemy.hit) {
+                player1.changeHP(enemy.value);
+                player1.renderHP();
+                this.generateLogs('hit', player1, player2, enemy.value);
             } else {
-                this.generateLogs('defence', this.subzero, this.scorpion);
+                this.generateLogs('defence', player2, player1);
             }
-        
-            if (hit !== defenceEnemy) {
-                this.subzero.changeHP(value);
-                this.subzero.renderHP();
-                this.generateLogs('hit', this.scorpion, this.subzero, value);
+
+            if (attack.hit !== enemy.defence) {
+                player2.changeHP(attack.value);
+                player2.renderHP();
+                this.generateLogs('hit', player1, player2, attack.value);
             } else {
-                this.generateLogs('defence', this.scorpion, this.subzero);
+                this.generateLogs('defence', player1, player2);
             }
-        
-            this.showResult(this.scorpion, this.subzero);
+
+            this.showResult(player1, player2);
         });
     }
 }
