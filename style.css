@@ -41,7 +41,7 @@ body {
 .wall-left {
     position: absolute;
     width: 87px;
-    background-image: url(assets/wall-left.png);
+    background-image: url(./assets/wall-left.png);
     min-height: 100vh;
     background-size: contain;
     background-repeat: repeat-y;
